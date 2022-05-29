@@ -237,3 +237,70 @@ ggplot(onewayanova, aes(x = Group, y = Length)) +
   scale_x_discrete() + xlab("Group") + ylab("Length (cm)")
 ```
 ![4f](asset/4f.png)
+
+## Soal No. 5
+Pertama-tama, download `.csv` lalu letakkan `.csv` pada directory `C:\Users\USER\Documents`, lalu read isi `.csv`
+```r
+GTL <- read_csv("GTL.csv")
+head(GTL)
+str(GTL)
+```
+### 5A
+```r
+soal_5a<-function(){
+  qplot(x = Temp, y = Light, geom = "point", data = GTL) +
+    facet_grid(.~Glass, labeller = label_both)
+}
+soal_5a()
+```
+![](asset/5A.png)
+### 5B
+```r
+#5B
+soal_5b<-function(){
+  GTL$Glass <- as.factor(GTL$Glass)
+  GTL$Temp_Factor <- as.factor(GTL$Temp)
+  str(GTL)
+  
+  anova <- aov(Light ~ Glass*Temp_Factor, data = GTL)
+  summary(anova)
+}
+soal_5b()
+```
+![](asset/5B.png)
+### 5C
+```r
+soal_5c<-function(){
+  data_summary <- group_by(GTL, Glass, Temp) %>%
+    summarise(mean=mean(Light), sd=sd(Light)) %>%
+    arrange(desc(mean))
+  print(data_summary)
+}
+soal_5c()
+```
+![](asset/5C.png)
+### 5D
+```r
+soal_5d<-function(){
+  tukey <- TukeyHSD(anova)
+  print(tukey)
+}
+soal_5d()
+```
+![](asset/5D.png)
+### 5E
+```r
+soal_5e<-function(){
+  tukey.cld <- multcompLetters4(anova, tukey)
+  print(tukey.cld)
+  
+  cld <- as.data.frame.list(tukey.cld$`Glass:Temp_Factor`)
+  data_summary$Tukey <- cld$Letters
+  print(data_summary)
+  
+  #Opsional: export .csv
+  write.csv("GTL_summary.csv")
+}
+soal_5e()
+```
+![](asset/Gambar5E.png)

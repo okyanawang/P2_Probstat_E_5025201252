@@ -106,109 +106,59 @@ ggplot(onewayanova, aes(x = Group, y = Length)) +
 
 
 
-# NOMOR 5 ________________________________________________________________________________________________________________________________
-library(ggplot2)
-library(readr)
-library(dplyr)
-library(multcompView)
-# A
+#5
+#Letakkan .csv pada directory C:\Users\USER\Documents
+GTL <- read_csv("GTL.csv")
+head(GTL)
 
-id <- "1aLUOdw_LVJq6VQrQEkuQhZ8FW43FemTJ"
-GTLData <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id))
-head(GTLData)
-str(GTLData)
-qplot(
-  x = Temp, 
-  y = Light, 
-  geom = "point", 
-  data = GTLData) + facet_grid(.~Glass, labeller = label_both)
+str(GTL)
 
-# B
-GTLData$Glass <- as.factor(GTLData$Glass)
-GTLData$Temp_Factor <- as.factor(GTLData$Temp)
-str(GTLData)
+#5A
+soal_5a<-function(){
+  qplot(x = Temp, y = Light, geom = "point", data = GTL) +
+    facet_grid(.~Glass, labeller = label_both)
+}
+soal_5a()
 
-anova <- aov(Light ~ Glass*Temp_Factor, data = GTLData)
-summary(anova)
-
-# C
-summary_table <- group_by(GTLData, Glass, Temp) 
-  %>%
-  summarise(
-    mean = mean(Light), 
-    sd = sd(Light)) 
-  %>%
-  arrange(desc(mean))
-
-print(summary_table)
-
-# D
-anova <- aov(Light ~ Glass*Temp_Factor, data = GTLData)
-print(TukeyHSD(anova))
-
-# E
-anova <- aov(Light ~ Glass*Temp_Factor, data = GTLData)
-tukey <- TukeyHSD(anova)
-
-compare_data <- multcompLetters4(anova, tukey)
-print(compare_data)
-
-cld <- as.data.frame.list(compare_data$`Glass:Temp_Factor`)
-compare_data$Tukey <- cld$Letters
-print(compare_data)
-### Nomor 3
-Diketahui perusahaan memiliki seorang data analyst ingin memecahkan permasalahan pengambilan keputusan dalam perusahaan tersebut. Selanjutnya didapatkanlah data berikut dari perusahaan saham tersebut.
-</br>
-![image](https://user-images.githubusercontent.com/70510279/170834251-73d308da-69c9-4e86-b2b8-4917e598efae.png)
-Dari data diatas berilah keputusan serta kesimpulan yang didapatkan dari hasil diatas. Asumsikan nilai variancenya sama, apakah ada perbedaan pada rata-ratanya (α= 0.05)? Buatlah :
-
-#### 3a
-H0 dan H1
-dilakukan perhitungan H0 sebagai berikut
-</br>
-![image](https://user-images.githubusercontent.com/70510279/170837176-254c2846-c1b7-47c0-aa9f-c3b2e5db149a.png)
-</br>
-dilakukan perhitungan H1 sebagai berikut
-</br>
-![image](https://user-images.githubusercontent.com/70510279/170837297-542b8a9e-309b-41be-92c5-880e284beef4.png)
-
-#### 3b
-Hitung Sampel Statistik
-Penghitungan dilakukan sebagai berikut
-```
-tsum.test(mean.x=3.64, s.x = 1.67, n.x = 19, mean.y =2.79 , s.y = 1.32, n.y = 27, alternative = "greater", var.equal = TRUE)
-```
-![image](https://user-images.githubusercontent.com/70510279/170847031-6d2d82a4-dad1-4e70-b204-5782eb790bf7.png)
+#5B
+soal_5b<-function(){
+  GTL$Glass <- as.factor(GTL$Glass)
+  GTL$Temp_Factor <- as.factor(GTL$Temp)
+  str(GTL)
+  
+  anova <- aov(Light ~ Glass*Temp_Factor, data = GTL)
+  summary(anova)
+}
+soal_5b()
 
 
-#### 3c
-Lakukan Uji Statistik (df =2)
+#5C
+soal_5c<-function(){
+  data_summary <- group_by(GTL, Glass, Temp) %>%
+    summarise(mean=mean(Light), sd=sd(Light)) %>%
+    arrange(desc(mean))
+  print(data_summary)
+}
+soal_5c()
 
-Melakukan install library `mosaic`
-```
-install.packages("mosaic")
-library(mosaic)
-```
 
-```
-plotDist(dist='t', df=2, col="blue")
-```
-![image](https://user-images.githubusercontent.com/70510279/170845594-721682ce-705c-4423-b6e2-5d3ad48e10cf.png)
+#5D
+soal_5d<-function(){
+  tukey <- TukeyHSD(anova)
+  print(tukey)
+}
+soal_5d()
 
-#### 3d
-Nilai kritikal
-Adapun untuk mendapatkan nilai kritikal bisa menggunakan `qchisq` dengan `df=2` sesuai soal sebelumnya
-
-![image](https://user-images.githubusercontent.com/70510279/170846422-617fe5b8-b90c-4e5a-9533-dfec22c62ff3.png)
-
-#### 3e
-Keputusan
-
-Teori keputusan adalah teori formal pengambilan keputusan di bawah ketidakpastian. 
-Aksinya adalah : `({a}_{a∈A})`
-Kemungkinan konsekuensi : `({c}_{c∈C})` (tergantung pada keadaan dan tindakan)
-Maka keputusan dapat dibuat dengan `t.test`
-
-#### 3f
-Kesimpulan
-Kesimpulan yang didapatkan yaitu perbedaan rata-rata yang terjadi tidak ada jika dilihat dari uji statistik dan akan ada tetapi tidak signifikan jika dipengaruhi nilai kritikal.
+#5E
+soal_5e<-function(){
+  tukey.cld <- multcompLetters4(anova, tukey)
+  print(tukey.cld)
+  
+  cld <- as.data.frame.list(tukey.cld$`Glass:Temp_Factor`)
+  data_summary$Tukey <- cld$Letters
+  print(data_summary)
+  
+  #Opsional: export .csv
+  write.csv("GTL_summary.csv")
+}
+soal_5e()
