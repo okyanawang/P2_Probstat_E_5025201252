@@ -169,3 +169,71 @@ Maka keputusan dapat dibuat dengan `t.test`
 #### 3f
 Kesimpulan
 Kesimpulan yang didapatkan yaitu perbedaan rata-rata yang terjadi tidak ada jika dilihat dari uji statistik dan akan ada tetapi tidak signifikan jika dipengaruhi nilai kritikal.
+
+## 4.
+Seorang Peneliti sedang meneliti spesies dari kucing di ITS . Dalam penelitiannya ia mengumpulkan data tiga spesies kucing yaitu kucing oren, kucing hitam dan kucing putih dengan panjangnya masing-masing. Jika :
+Diketahui dataset https://intip.in/datasetprobstat1
+H0 : Tidak ada perbedaan panjang antara ketiga spesies atau rata-rata panjangnya sama
+
+```
+onewayanova = read.table("onewayanova.txt",h=T)
+onewayanova
+```
+### a. Buatlah masing masing jenis spesies menjadi 3 subjek "Grup" (grup 1,grup2,grup 3). Lalu Gambarkan plot kuantil normal untuk setiap kelompok dan lihat apakah ada outlier utama dalam homogenitas varians.
+Karena setiap grup nya berdistribusi normal maka tidak ada outlier utama. Untuk membuat grup tiap jenis nya, bisa menggunakan factor kemudian memberikan label dan subset setiap grup. Group1 adalah kucing oren, Group2 adalah kucing hitam dan Group3 adalah kucing putih.
+```
+# set group jadi factor
+onewayanova$Group <- as.factor(onewayanova$Group)
+# memberikan label
+onewayanova$Group = factor(onewayanova$Group,labels = c("kucing oren", "kucing hitam", "kucing putih"))
+Group1 <- subset(onewayanova, Group == "kucing oren")
+Group2 <- subset(onewayanova, Group == "kucing hitam")
+Group3 <- subset(onewayanova, Group == "kucing putih")
+```
+
+Kemudian menggambarkan plot kuantil normal untuk tiap grup seperti berikut
+```
+qqnorm(Group1$Length)
+qqline(Group1$Length)
+qqnorm(Group2$Length)
+qqline(Group2$Length)
+qqnorm(Group3$Length)
+qqline(Group3$Length)
+```
+![4a](asset/4a.1.png) ![4a1](asset/4a.2.png) ![4a2](asset/4a.3.png)
+
+### b. carilah atau periksalah Homogeneity of variances nya, Berapa nilai p yang didapatkan? , Apa hipotesis dan kesimpulan yang dapat diambil ?
+Untuk memeriksa homogenitas varians dilakukan seperti berikut
+```
+bartlett.test(Length ~ Group, data = onewayanova)
+```
+![4b](asset/4b.png)
+
+Didapatkan p-value sebesar 0.8054, p-value berada diatas 0.05 yang artinya varians dari ketiga kelompok sama dan kesimpulannya terdapat homogenitas varians untuk melakukan anova satu arah (one way).
+
+### c. Untuk uji ANOVA (satu arah), buatlah model linier dengan Panjang versus Grup dan beri nama model tersebut model 1.
+```
+model1 = lm(Length ~ Group, data = onewayanova)
+anova(model1)
+```
+![4c](asset/4c.png)
+
+### d. Dari Hasil Poin C, Berapakah nilai-p?, Apa yang dapat Anda simpulkan dari H0?
+Didapatkan nilai F-value = 7.0982, yang berarti nilai P-value lebih kecil dari 0.05. Kesimpulannya kita menolak null hypotesis / H0, maka menunjukkan adanya perbedaan panjang antara ketiga spesies atau rata-rata panjangnya sama.
+
+### e. Verifikasilah jawaban model 1 dengan Post-hoc test Tukey HSD, dari nilai p yang didapatkan apakah satu jenis kucing lebih panjang dari yang lain? Jelaskan.
+Dilakukan Post-hoc test Tukey HSD untuk mengetahui perbandingan tiap-tiap spesies
+```
+TukeyHSD(aov(model1))
+```
+![4e](asset/4e.png)
+
+Dari hasil diatas dapat diketahui p-value tiap 2 jenis grup. Jika p-value lebih kecil dari 0.05, maka panjang kedua grup berbeda, jika p-value lebih dari 0.05 maka panjangnya sama. Berdasarkan hasil diatas dapat disimpulkan kucing putih dan kucing oren memiliki ukuran atau panjang yang sama.
+
+### f. Visualisasikan data dengan ggplot2
+```
+ggplot(onewayanova, aes(x = Group, y = Length)) +
+  geom_boxplot(color = c("#00AFBB", "#E7B800", "#FC4E07")) +
+  scale_x_discrete() + xlab("Group") + ylab("Length (cm)")
+```
+![4f](asset/4f.png)
